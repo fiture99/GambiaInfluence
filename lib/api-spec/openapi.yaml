@@ -3,13 +3,19 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: GambiaInfluence API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: influencers
+    description: Influencer operations
+  - name: businesses
+    description: Business operations
+  - name: stats
+    description: Platform statistics
 paths:
   /healthz:
     get:
@@ -24,6 +30,277 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /influencers:
+    get:
+      operationId: listInfluencers
+      tags: [influencers]
+      summary: List all influencers
+      parameters:
+        - in: query
+          name: location
+          schema:
+            type: string
+          description: Filter by location
+        - in: query
+          name: niche
+          schema:
+            type: string
+          description: Filter by niche
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by name
+      responses:
+        "200":
+          description: List of influencers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Influencer"
+    post:
+      operationId: createInfluencer
+      tags: [influencers]
+      summary: Register as an influencer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateInfluencerBody"
+      responses:
+        "201":
+          description: Influencer created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Influencer"
+        "400":
+          description: Bad request
+
+  /influencers/{id}:
+    get:
+      operationId: getInfluencer
+      tags: [influencers]
+      summary: Get influencer by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Influencer found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Influencer"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateInfluencer
+      tags: [influencers]
+      summary: Update influencer profile
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateInfluencerBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Influencer"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteInfluencer
+      tags: [influencers]
+      summary: Delete influencer
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /businesses:
+    get:
+      operationId: listBusinesses
+      tags: [businesses]
+      summary: List all businesses
+      responses:
+        "200":
+          description: List of businesses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Business"
+    post:
+      operationId: createBusiness
+      tags: [businesses]
+      summary: Register as a business
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBusinessBody"
+      responses:
+        "201":
+          description: Business created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Business"
+        "400":
+          description: Bad request
+
+  /businesses/{id}:
+    get:
+      operationId: getBusiness
+      tags: [businesses]
+      summary: Get business by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Business found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Business"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateBusiness
+      tags: [businesses]
+      summary: Update business profile
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBusinessBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Business"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteBusiness
+      tags: [businesses]
+      summary: Delete business
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /stats/platform:
+    get:
+      operationId: getPlatformStats
+      tags: [stats]
+      summary: Get overall platform statistics
+      responses:
+        "200":
+          description: Platform stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
+  /stats/niches:
+    get:
+      operationId: getNicheBreakdown
+      tags: [stats]
+      summary: Get influencer count by niche
+      responses:
+        "200":
+          description: Niche breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NicheCount"
+
+  /stats/locations:
+    get:
+      operationId: getLocationBreakdown
+      tags: [stats]
+      summary: Get influencer count by location
+      responses:
+        "200":
+          description: Location breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LocationCount"
+
+  /influencers/top:
+    get:
+      operationId: getTopInfluencers
+      tags: [influencers]
+      summary: Get top influencers by follower count
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Number of top influencers to return
+      responses:
+        "200":
+          description: Top influencers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Influencer"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +311,222 @@ components:
       required:
         - status
 
+    Influencer:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        location:
+          type: string
+        niche:
+          type: string
+        followersCount:
+          type: integer
+        instagramUrl:
+          type: ["string", "null"]
+        tiktokUrl:
+          type: ["string", "null"]
+        youtubeUrl:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        whatsappNumber:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        profileImageUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - location
+        - niche
+        - followersCount
+        - instagramUrl
+        - tiktokUrl
+        - youtubeUrl
+        - phone
+        - whatsappNumber
+        - bio
+        - profileImageUrl
+        - createdAt
+        - updatedAt
+
+    CreateInfluencerBody:
+      type: object
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        niche:
+          type: string
+        followersCount:
+          type: integer
+        instagramUrl:
+          type: ["string", "null"]
+        tiktokUrl:
+          type: ["string", "null"]
+        youtubeUrl:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        whatsappNumber:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        profileImageUrl:
+          type: ["string", "null"]
+      required:
+        - name
+        - location
+        - niche
+        - followersCount
+
+    UpdateInfluencerBody:
+      type: object
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        niche:
+          type: string
+        followersCount:
+          type: integer
+        instagramUrl:
+          type: ["string", "null"]
+        tiktokUrl:
+          type: ["string", "null"]
+        youtubeUrl:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        whatsappNumber:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        profileImageUrl:
+          type: ["string", "null"]
+
+    Business:
+      type: object
+      properties:
+        id:
+          type: integer
+        businessName:
+          type: string
+        businessType:
+          type: string
+        contactEmail:
+          type: ["string", "null"]
+        contactPhone:
+          type: ["string", "null"]
+        location:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        website:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - businessName
+        - businessType
+        - contactEmail
+        - contactPhone
+        - location
+        - description
+        - website
+        - createdAt
+        - updatedAt
+
+    CreateBusinessBody:
+      type: object
+      properties:
+        businessName:
+          type: string
+        businessType:
+          type: string
+        contactEmail:
+          type: ["string", "null"]
+        contactPhone:
+          type: ["string", "null"]
+        location:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        website:
+          type: ["string", "null"]
+      required:
+        - businessName
+        - businessType
+
+    UpdateBusinessBody:
+      type: object
+      properties:
+        businessName:
+          type: string
+        businessType:
+          type: string
+        contactEmail:
+          type: ["string", "null"]
+        contactPhone:
+          type: ["string", "null"]
+        location:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        website:
+          type: ["string", "null"]
+
+    PlatformStats:
+      type: object
+      properties:
+        totalInfluencers:
+          type: integer
+        totalBusinesses:
+          type: integer
+        totalFollowers:
+          type: integer
+        topNiche:
+          type: string
+        topLocation:
+          type: string
+      required:
+        - totalInfluencers
+        - totalBusinesses
+        - totalFollowers
+        - topNiche
+        - topLocation
+
+    NicheCount:
+      type: object
+      properties:
+        niche:
+          type: string
+        count:
+          type: integer
+      required:
+        - niche
+        - count
+
+    LocationCount:
+      type: object
+      properties:
+        location:
+          type: string
+        count:
+          type: integer
+      required:
+        - location
+        - count
