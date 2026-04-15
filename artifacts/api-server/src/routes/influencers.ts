@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { eq, desc, ilike, and } from "drizzle-orm";
 import { db, influencersTable } from "@workspace/db";
+import { requireAdmin } from "./admin";
 import {
   ListInfluencersQueryParams,
   CreateInfluencerBody,
@@ -63,7 +64,7 @@ router.get("/influencers", async (req, res): Promise<void> => {
   res.json(ListInfluencersResponse.parse(influencers.map(serializeInfluencer)));
 });
 
-router.post("/influencers", async (req, res): Promise<void> => {
+router.post("/influencers", requireAdmin, async (req, res): Promise<void> => {
   const parsed = CreateInfluencerBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -98,7 +99,7 @@ router.get("/influencers/:id", async (req, res): Promise<void> => {
   res.json(GetInfluencerResponse.parse(serializeInfluencer(influencer)));
 });
 
-router.patch("/influencers/:id", async (req, res): Promise<void> => {
+router.patch("/influencers/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = UpdateInfluencerParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -125,7 +126,7 @@ router.patch("/influencers/:id", async (req, res): Promise<void> => {
   res.json(UpdateInfluencerResponse.parse(serializeInfluencer(influencer)));
 });
 
-router.delete("/influencers/:id", async (req, res): Promise<void> => {
+router.delete("/influencers/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = DeleteInfluencerParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

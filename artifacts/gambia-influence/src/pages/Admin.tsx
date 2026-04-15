@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,6 +15,7 @@ import {
   useUpdateBusiness,
   useDeleteBusiness,
   getListBusinessesQueryKey,
+  setAuthTokenGetter,
 } from "@workspace/api-client-react";
 import type { Influencer, Business } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
@@ -733,9 +734,118 @@ function BusinessesTab() {
   );
 }
 
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+
+const SESSION_KEY = "gi_admin_token";
+
+const loginSchema = z.object({
+  password: z.string().min(1, "Password is required"),
+});
+type LoginFormValues = z.infer<typeof loginSchema>;
+
+function applyToken(token: string) {
+  sessionStorage.setItem(SESSION_KEY, token);
+  setAuthTokenGetter(() => token);
+}
+
+function clearToken() {
+  sessionStorage.removeItem(SESSION_KEY);
+  setAuthTokenGetter(null);
+}
+
+function LoginGate({ onSuccess }: { onSuccess: () => void }) {
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { password: "" },
+  });
+
+  async function onSubmit({ password }: LoginFormValues) {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      if (!res.ok) {
+        toast({ title: "Incorrect password", variant: "destructive" });
+        return;
+      }
+
+      const { token } = (await res.json()) as { token: string };
+      applyToken(token);
+      onSuccess();
+    } catch {
+      toast({ title: "Login failed", description: "Please try again.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          <span className="text-2xl font-black text-primary tracking-tighter">GambiaInfluence</span>
+          <p className="mt-2 text-muted-foreground text-sm">Admin access only</p>
+        </div>
+        <div className="border rounded-xl p-6 bg-card shadow-sm">
+          <h1 className="text-lg font-semibold mb-4">Sign in to Admin Panel</h1>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField control={form.control} name="password" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Enter admin password" autoFocus {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Signing in..." : "Sign In"}
+              </Button>
+            </form>
+          </Form>
+        </div>
+        <div className="text-center mt-4">
+          <Link href="/">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="w-4 h-4 mr-1" /> Back to Site
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Admin Page ──────────────────────────────────────────────────────────
 
 export default function Admin() {
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem(SESSION_KEY);
+    if (stored) {
+      applyToken(stored);
+      setAuthed(true);
+    }
+  }, []);
+
+  if (!authed) {
+    return <LoginGate onSuccess={() => setAuthed(true)} />;
+  }
+
+  function handleLogout() {
+    clearToken();
+    setAuthed(false);
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card sticky top-0 z-10">
@@ -744,11 +854,16 @@ export default function Admin() {
             <span className="font-bold text-lg">Admin Panel</span>
             <span className="text-muted-foreground text-sm hidden sm:inline">· GambiaInfluence</span>
           </div>
-          <Link href="/">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-1" /> Back to Site
+          <div className="flex items-center gap-2">
+            <Link href="/">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-1" /> Back to Site
+              </Button>
+            </Link>
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              Sign Out
             </Button>
-          </Link>
+          </div>
         </div>
       </header>
 

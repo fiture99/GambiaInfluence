@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { eq, desc } from "drizzle-orm";
 import { db, businessesTable } from "@workspace/db";
+import { requireAdmin } from "./admin";
 import {
   CreateBusinessBody,
   GetBusinessParams,
@@ -33,7 +34,7 @@ router.get("/businesses", async (_req, res): Promise<void> => {
   res.json(ListBusinessesResponse.parse(businesses.map(serializeBusiness)));
 });
 
-router.post("/businesses", async (req, res): Promise<void> => {
+router.post("/businesses", requireAdmin, async (req, res): Promise<void> => {
   const parsed = CreateBusinessBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -68,7 +69,7 @@ router.get("/businesses/:id", async (req, res): Promise<void> => {
   res.json(GetBusinessResponse.parse(serializeBusiness(business)));
 });
 
-router.patch("/businesses/:id", async (req, res): Promise<void> => {
+router.patch("/businesses/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = UpdateBusinessParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -95,7 +96,7 @@ router.patch("/businesses/:id", async (req, res): Promise<void> => {
   res.json(UpdateBusinessResponse.parse(serializeBusiness(business)));
 });
 
-router.delete("/businesses/:id", async (req, res): Promise<void> => {
+router.delete("/businesses/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = DeleteBusinessParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
