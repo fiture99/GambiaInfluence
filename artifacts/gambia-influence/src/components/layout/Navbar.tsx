@@ -9,6 +9,9 @@ export function Navbar() {
           <span className="text-2xl font-black text-primary tracking-tighter">GambiaInfluence</span>
         </Link>
         <div className="flex items-center gap-6">
+          <Link href="/admin" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+            Admin
+          </Link>
           <Link href="/influencers" className="text-sm font-medium hover:text-primary transition-colors">
             Browse
           </Link>

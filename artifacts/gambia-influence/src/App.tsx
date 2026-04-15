@@ -10,22 +10,28 @@ import Influencers from "@/pages/Influencers";
 import InfluencerProfile from "@/pages/InfluencerProfile";
 import RegisterInfluencer from "@/pages/RegisterInfluencer";
 import RegisterBusiness from "@/pages/RegisterBusiness";
+import Admin from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
 
 function Router() {
   return (
-    <MainLayout>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/influencers" component={Influencers} />
-        <Route path="/influencers/:id" component={InfluencerProfile} />
-        <Route path="/register/influencer" component={RegisterInfluencer} />
-        <Route path="/register/business" component={RegisterBusiness} />
-        <Route component={NotFound} />
-      </Switch>
-    </MainLayout>
+    <Switch>
+      <Route path="/admin" component={Admin} />
+      <Route>
+        <MainLayout>
+          <Switch>
+            <Route path="/" component={Home} />
+            <Route path="/influencers" component={Influencers} />
+            <Route path="/influencers/:id" component={InfluencerProfile} />
+            <Route path="/register/influencer" component={RegisterInfluencer} />
+            <Route path="/register/business" component={RegisterBusiness} />
+            <Route component={NotFound} />
+          </Switch>
+        </MainLayout>
+      </Route>
+    </Switch>
   );
 }
 
