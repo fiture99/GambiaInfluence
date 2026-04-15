@@ -1,44 +1,61 @@
 import { Link } from "wouter";
 import { Influencer } from "@workspace/api-client-react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin, Users } from "lucide-react";
 
 export function InfluencerCard({ influencer }: { influencer: Influencer }) {
+  const hasImage = !!influencer.profileImageUrl;
+  
   return (
-    <Link href={`/influencers/${influencer.id}`} className="block">
-      <Card className="h-full overflow-hidden hover-elevate transition-all border-border/50 group cursor-pointer">
-        <CardContent className="p-6">
-          <div className="flex flex-col items-center text-center space-y-4">
-            <Avatar className="h-24 w-24 border-4 border-background shadow-sm ring-2 ring-primary/20 group-hover:ring-primary transition-all">
-              <AvatarImage src={influencer.profileImageUrl || undefined} alt={influencer.name} className="object-cover" />
-              <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
+    <Link href={`/influencers/${influencer.id}`} className="block h-full group">
+      <Card className="h-full overflow-hidden border-0 bg-transparent rounded-2xl relative shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1">
+        <div className="absolute inset-0 z-0">
+          {hasImage ? (
+            <img 
+              src={influencer.profileImageUrl!} 
+              alt={influencer.name} 
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-primary/80 to-secondary/80 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
+              <span className="text-6xl font-black text-white/50">
                 {influencer.name.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h3 className="font-bold text-xl line-clamp-1">{influencer.name}</h3>
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{influencer.bio || "No bio available"}</p>
+              </span>
             </div>
-            <div className="flex flex-wrap justify-center gap-2 mt-2">
-              <Badge variant="secondary" className="font-medium bg-secondary/15 text-secondary-foreground hover:bg-secondary/25">
+          )}
+        </div>
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+        
+        <CardContent className="relative z-20 h-full flex flex-col justify-end p-5 min-h-[380px]">
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="bg-primary text-primary-foreground border-none font-bold text-xs">
                 {influencer.niche}
               </Badge>
-              <Badge variant="outline" className="font-medium">
-                <MapPin className="w-3 h-3 mr-1" />
-                {influencer.location}
-              </Badge>
+            </div>
+            
+            <div>
+              <h3 className="font-black text-2xl text-white line-clamp-1 group-hover:text-primary-foreground transition-colors">{influencer.name}</h3>
+              <div className="flex items-center text-white/80 text-sm mt-1 font-medium">
+                <MapPin className="w-3.5 h-3.5 mr-1" />
+                <span className="truncate">{influencer.location}</span>
+              </div>
+            </div>
+            
+            <div className="pt-3 border-t border-white/20 flex items-center justify-between text-white text-sm font-bold">
+              <div className="flex items-center">
+                <Users className="w-4 h-4 mr-1.5 text-primary" />
+                {(influencer.followersCount || 0).toLocaleString()} followers
+              </div>
+              <span className="opacity-0 translate-x-[-10px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                View &rarr;
+              </span>
             </div>
           </div>
         </CardContent>
-        <CardFooter className="bg-muted/30 p-4 flex justify-between items-center border-t border-border/30">
-          <div className="flex items-center text-sm font-medium text-muted-foreground">
-            <Users className="w-4 h-4 mr-1.5" />
-            {(influencer.followersCount || 0).toLocaleString()} followers
-          </div>
-          <span className="text-primary text-sm font-bold group-hover:underline">View Profile &rarr;</span>
-        </CardFooter>
       </Card>
     </Link>
   );

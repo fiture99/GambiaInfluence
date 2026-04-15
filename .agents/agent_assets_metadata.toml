@@ -1,0 +1,50 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "JHxB24CahaeRYeBm_w_cG"
+uri = "file://artifacts/gambia-influence/public/profiles/fatou-jallow.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "MLohWzOYbFbCqVxVkNZyd"
+uri = "file://artifacts/gambia-influence/public/profiles/omar-baldeh.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ycLyaxIm2a7gCF9Rwcvac"
+uri = "file://artifacts/gambia-influence/public/profiles/mariama-ceesay.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "g0woCmlju8kdi9KV8ZCM7"
+uri = "file://artifacts/gambia-influence/public/profiles/lamin-touray.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "c5EXj6huYErGS4B-F7eRv"
+uri = "file://artifacts/gambia-influence/public/profiles/isatou-njie.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "VAsF2ybBsQgf1hqTOIkXx"
+uri = "file://artifacts/gambia-influence/public/profiles/alieu-darboe.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ZMhTOSmnJjxZRCLcczxA9"
+uri = "file://artifacts/gambia-influence/public/profiles/ndey-sanneh.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ou6IyfbvE42A1vzMxQUbd"
+uri = "file://artifacts/gambia-influence/public/profiles/ebrima-colley.png"
+type = "image"
+title = "generated_image"
