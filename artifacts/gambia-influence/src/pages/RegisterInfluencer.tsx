@@ -84,7 +84,7 @@ export default function RegisterInfluencer() {
       {
         onSuccess: (data) => {
           toast({
-            title: "Welcome to GambiaInfluence!",
+            title: "Welcome to GambiaInfluencers!",
             description: "Your creator profile has been created successfully.",
           });
           setLocation(`/influencers/${data.id}`);
