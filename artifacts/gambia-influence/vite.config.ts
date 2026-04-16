@@ -58,10 +58,26 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
   },
-  server: {
+  // server: {
+  //   port,
+  //   host: "0.0.0.0",
+  //   allowedHosts: true,
+  //   fs: {
+  //     strict: true,
+  //     deny: ["**/.*"],
+  //   },
+  // },
+
+    server: {
     port,
     host: "0.0.0.0",
     allowedHosts: true,
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
     fs: {
       strict: true,
       deny: ["**/.*"],
