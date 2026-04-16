@@ -1,38 +1,60 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
+import bcrypt from "bcryptjs";
+import { db, adminUsersTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
 
-function getAdminToken(): string {
-  const password = process.env["ADMIN_PASSWORD"];
+function getSecret(): string {
   const secret = process.env["SESSION_SECRET"];
-
-  if (!password || !secret) {
-    throw new Error("ADMIN_PASSWORD and SESSION_SECRET environment variables are required");
-  }
-
-  return createHmac("sha256", secret).update(password).digest("hex");
+  if (!secret) throw new Error("SESSION_SECRET is required");
+  return secret;
 }
 
-export function requireAdmin(req: Request, res: Response, next: NextFunction): void {
+function makeToken(userId: number, username: string): string {
+  const payload = `${userId}:${username}`;
+  const sig = createHmac("sha256", getSecret()).update(payload).digest("hex");
+  return `${Buffer.from(payload).toString("base64")}.${sig}`;
+}
+
+function verifyToken(token: string): { userId: number; username: string } | null {
+  try {
+    const [encoded, sig] = token.split(".");
+    if (!encoded || !sig) return null;
+    const payload = Buffer.from(encoded, "base64").toString("utf8");
+    const expectedSig = createHmac("sha256", getSecret()).update(payload).digest("hex");
+    const sigBuf = Buffer.from(sig);
+    const expectedBuf = Buffer.from(expectedSig);
+    if (sigBuf.length !== expectedBuf.length || !timingSafeEqual(sigBuf, expectedBuf)) return null;
+    const [userIdStr, username] = payload.split(":");
+    const userId = parseInt(userIdStr ?? "", 10);
+    if (!username || isNaN(userId)) return null;
+    return { userId, username };
+  } catch {
+    return null;
+  }
+}
+
+export async function requireAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
   const authHeader = req.headers["authorization"];
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!authHeader?.startsWith("Bearer ")) {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
 
   const token = authHeader.slice(7);
-
-  let validToken: string;
-  try {
-    validToken = getAdminToken();
-  } catch {
-    res.status(500).json({ error: "Server misconfiguration" });
+  const parsed = verifyToken(token);
+  if (!parsed) {
+    res.status(401).json({ error: "Unauthorized" });
     return;
   }
 
-  const tokenBuf = Buffer.from(token);
-  const validBuf = Buffer.from(validToken);
+  const [user] = await db
+    .select({ id: adminUsersTable.id })
+    .from(adminUsersTable)
+    .where(eq(adminUsersTable.id, parsed.userId))
+    .limit(1);
 
-  if (tokenBuf.length !== validBuf.length || !timingSafeEqual(tokenBuf, validBuf)) {
+  if (!user) {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
@@ -42,13 +64,12 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
 
 const router: IRouter = Router();
 
-router.post("/admin/login", (req: Request, res: Response): void => {
-  const { password } = req.body as { password?: string };
-
-  if (!password || typeof password !== "string") {
-    res.status(400).json({ error: "Password is required" });
-    return;
-  }
+router.post("/admin/register", async (req: Request, res: Response): Promise<void> => {
+  const { registrationKey, username, password } = req.body as {
+    registrationKey?: string;
+    username?: string;
+    password?: string;
+  };
 
   const adminPassword = process.env["ADMIN_PASSWORD"];
   if (!adminPassword) {
@@ -56,27 +77,69 @@ router.post("/admin/login", (req: Request, res: Response): void => {
     return;
   }
 
-  const passwordBuf = Buffer.from(password);
-  const adminPasswordBuf = Buffer.from(adminPassword);
+  if (!registrationKey || registrationKey !== adminPassword) {
+    res.status(401).json({ error: "Invalid registration key" });
+    return;
+  }
 
-  const match =
-    passwordBuf.length === adminPasswordBuf.length &&
-    timingSafeEqual(passwordBuf, adminPasswordBuf);
+  if (!username || typeof username !== "string" || username.trim().length < 3) {
+    res.status(400).json({ error: "Username must be at least 3 characters" });
+    return;
+  }
 
+  if (!password || typeof password !== "string" || password.length < 6) {
+    res.status(400).json({ error: "Password must be at least 6 characters" });
+    return;
+  }
+
+  const existing = await db
+    .select({ id: adminUsersTable.id })
+    .from(adminUsersTable)
+    .where(eq(adminUsersTable.username, username.trim()))
+    .limit(1);
+
+  if (existing.length > 0) {
+    res.status(409).json({ error: "Username already exists" });
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+
+  const [newUser] = await db
+    .insert(adminUsersTable)
+    .values({ username: username.trim(), passwordHash })
+    .returning({ id: adminUsersTable.id, username: adminUsersTable.username });
+
+  res.status(201).json({ id: newUser?.id, username: newUser?.username });
+});
+
+router.post("/admin/login", async (req: Request, res: Response): Promise<void> => {
+  const { username, password } = req.body as { username?: string; password?: string };
+
+  if (!username || !password) {
+    res.status(400).json({ error: "Username and password are required" });
+    return;
+  }
+
+  const [user] = await db
+    .select()
+    .from(adminUsersTable)
+    .where(eq(adminUsersTable.username, username.trim()))
+    .limit(1);
+
+  if (!user) {
+    res.status(401).json({ error: "Invalid credentials" });
+    return;
+  }
+
+  const match = await bcrypt.compare(password, user.passwordHash);
   if (!match) {
-    res.status(401).json({ error: "Invalid password" });
+    res.status(401).json({ error: "Invalid credentials" });
     return;
   }
 
-  let token: string;
-  try {
-    token = getAdminToken();
-  } catch {
-    res.status(500).json({ error: "Server misconfiguration" });
-    return;
-  }
-
-  res.json({ token });
+  const token = makeToken(user.id, user.username);
+  res.json({ token, username: user.username });
 });
 
 export default router;

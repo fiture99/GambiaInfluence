@@ -739,6 +739,7 @@ function BusinessesTab() {
 const SESSION_KEY = "gi_admin_token";
 
 const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
 });
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -753,32 +754,32 @@ function clearToken() {
   setAuthTokenGetter(null);
 }
 
-function LoginGate({ onSuccess }: { onSuccess: () => void }) {
+function LoginGate({ onSuccess }: { onSuccess: (username: string) => void }) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { password: "" },
+    defaultValues: { username: "", password: "" },
   });
 
-  async function onSubmit({ password }: LoginFormValues) {
+  async function onSubmit({ username, password }: LoginFormValues) {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       });
 
       if (!res.ok) {
-        toast({ title: "Incorrect password", variant: "destructive" });
+        toast({ title: "Invalid credentials", description: "Check your username and password.", variant: "destructive" });
         return;
       }
 
-      const { token } = (await res.json()) as { token: string };
+      const { token, username: loggedInAs } = (await res.json()) as { token: string; username: string };
       applyToken(token);
-      onSuccess();
+      onSuccess(loggedInAs);
     } catch {
       toast({ title: "Login failed", description: "Please try again.", variant: "destructive" });
     } finally {
@@ -797,11 +798,20 @@ function LoginGate({ onSuccess }: { onSuccess: () => void }) {
           <h1 className="text-lg font-semibold mb-4">Sign in to Admin Panel</h1>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField control={form.control} name="username" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input type="text" placeholder="Enter your username" autoFocus {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
               <FormField control={form.control} name="password" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Enter admin password" autoFocus {...field} />
+                    <Input type="password" placeholder="Enter your password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -828,21 +838,30 @@ function LoginGate({ onSuccess }: { onSuccess: () => void }) {
 
 export default function Admin() {
   const [authed, setAuthed] = useState(false);
+  const [adminUsername, setAdminUsername] = useState<string>("");
 
   useEffect(() => {
     const stored = sessionStorage.getItem(SESSION_KEY);
+    const storedUser = sessionStorage.getItem("gi_admin_user");
     if (stored) {
       applyToken(stored);
       setAuthed(true);
+      if (storedUser) setAdminUsername(storedUser);
     }
   }, []);
 
   if (!authed) {
-    return <LoginGate onSuccess={() => setAuthed(true)} />;
+    return <LoginGate onSuccess={(username) => {
+      sessionStorage.setItem("gi_admin_user", username);
+      setAdminUsername(username);
+      setAuthed(true);
+    }} />;
   }
 
   function handleLogout() {
     clearToken();
+    sessionStorage.removeItem("gi_admin_user");
+    setAdminUsername("");
     setAuthed(false);
   }
 
@@ -855,6 +874,11 @@ export default function Admin() {
             <span className="text-muted-foreground text-sm hidden sm:inline">· GambiaInfluencers</span>
           </div>
           <div className="flex items-center gap-2">
+            {adminUsername && (
+              <span className="text-sm text-muted-foreground hidden sm:inline">
+                Signed in as <strong>{adminUsername}</strong>
+              </span>
+            )}
             <Link href="/">
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-1" /> Back to Site
