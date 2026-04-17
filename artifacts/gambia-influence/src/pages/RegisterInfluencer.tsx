@@ -5,6 +5,7 @@ import { useLocation } from "wouter";
 import { useCreateInfluencer } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { useRef, useState } from "react";
 import {
   Form,
   FormControl,
@@ -48,6 +49,8 @@ export default function RegisterInfluencer() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const createInfluencer = useCreateInfluencer();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -84,7 +87,7 @@ export default function RegisterInfluencer() {
       {
         onSuccess: (data) => {
           toast({
-            title: "Welcome to GambiaInfluencers!",
+            title: "Welcome to GamInfluencers!",
             description: "Your creator profile has been created successfully.",
           });
           setLocation(`/influencers/${data.id}`);
@@ -140,11 +143,49 @@ export default function RegisterInfluencer() {
                   name="profileImageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-base">Profile Image URL</FormLabel>
+                      <FormLabel className="text-base">Profile Image</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://..." className="h-12" {...field} />
+                        <div className="flex flex-col gap-3">
+                          {/* Hidden file input */}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            ref={fileInputRef}
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                const base64 = reader.result as string;
+                                setImagePreview(base64);
+                                field.onChange(base64); // store base64 as the value
+                              };
+                              reader.readAsDataURL(file);
+                            }}
+                          />
+
+                          {/* Preview */}
+                          {imagePreview && (
+                            <img
+                              src={imagePreview}
+                              alt="Preview"
+                              className="w-20 h-20 rounded-full object-cover border-2 border-muted"
+                            />
+                          )}
+
+                          {/* Upload button */}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="h-12 w-full"
+                            onClick={() => fileInputRef.current?.click()}
+                          >
+                            {imagePreview ? "Change Photo" : "Upload Photo"}
+                          </Button>
+                        </div>
                       </FormControl>
-                      <FormDescription>Link to your profile photo</FormDescription>
+                      <FormDescription>Upload your profile photo</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

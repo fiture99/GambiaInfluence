@@ -81,7 +81,7 @@ export default function InfluencerProfile() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3 min-w-[200px]">
+                {/* <div className="flex flex-col gap-3 min-w-[200px]">
                   {influencer.whatsappNumber && (
                     <a href={`https://wa.me/${influencer.whatsappNumber}`} target="_blank" rel="noopener noreferrer">
                       <Button className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white hover-elevate shadow-sm h-12 text-base font-bold">
@@ -96,7 +96,7 @@ export default function InfluencerProfile() {
                       </Button>
                     </a>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef} from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,6 +24,7 @@ import {
   Form,
   FormControl,
   FormField,
+  FormDescription,
   FormItem,
   FormLabel,
   FormMessage,
@@ -90,6 +91,8 @@ const influencerSchema = z.object({
   profileImageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
+
+
 type InfluencerFormValues = z.infer<typeof influencerSchema>;
 
 const influencerDefaults: InfluencerFormValues = {
@@ -138,6 +141,12 @@ function InfluencerDialog({ open, onClose, editing }: InfluencerDialogProps) {
   const queryClient = useQueryClient();
   const createInfluencer = useCreateInfluencer();
   const updateInfluencer = useUpdateInfluencer();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+   useEffect(() => {
+    setImagePreview(editing?.profileImageUrl ?? null);
+  }, [editing, open]);
 
   const form = useForm<InfluencerFormValues>({
     resolver: zodResolver(influencerSchema),
@@ -186,13 +195,58 @@ function InfluencerDialog({ open, onClose, editing }: InfluencerDialogProps) {
                   <FormMessage />
                 </FormItem>
               )} />
-              <FormField control={form.control} name="profileImageUrl" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Profile Image URL</FormLabel>
-                  <FormControl><Input placeholder="https://..." {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+              <FormField
+                control={form.control}
+                name="profileImageUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base">Profile Image</FormLabel>
+                    <FormControl>
+                      <div className="flex flex-col gap-3">
+                        {/* Hidden file input */}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          ref={fileInputRef}
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              const base64 = reader.result as string;
+                              setImagePreview(base64);
+                              field.onChange(base64); // store base64 as the value
+                            };
+                            reader.readAsDataURL(file);
+                          }}
+                        />
+
+                        {/* Preview */}
+                        {imagePreview && (
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="w-20 h-20 rounded-full object-cover border-2 border-muted"
+                          />
+                        )}
+
+                        {/* Upload button */}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-12 w-full"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          {imagePreview ? "Change Photo" : "Upload Photo"}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormDescription>Upload your profile photo</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField control={form.control} name="location" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Location *</FormLabel>
@@ -230,20 +284,20 @@ function InfluencerDialog({ open, onClose, editing }: InfluencerDialogProps) {
                   <FormMessage />
                 </FormItem>
               )} />
-              <FormField control={form.control} name="whatsappNumber" render={({ field }) => (
+              {/* <FormField control={form.control} name="whatsappNumber" render={({ field }) => (
                 <FormItem>
                   <FormLabel>WhatsApp Number</FormLabel>
                   <FormControl><Input placeholder="220..." {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
-              )} />
-              <FormField control={form.control} name="phone" render={({ field }) => (
+              )} /> */}
+              {/* <FormField control={form.control} name="phone" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Phone</FormLabel>
                   <FormControl><Input {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
-              )} />
+              )} /> */}
               <FormField control={form.control} name="instagramUrl" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Instagram URL</FormLabel>
@@ -791,7 +845,7 @@ function LoginGate({ onSuccess }: { onSuccess: (username: string) => void }) {
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <span className="text-2xl font-black text-primary tracking-tighter">GambiaInfluencers</span>
+          <span className="text-2xl font-black text-primary tracking-tighter">GamInfluencers</span>
           <p className="mt-2 text-muted-foreground text-sm">Admin access only</p>
         </div>
         <div className="border rounded-xl p-6 bg-card shadow-sm">
@@ -850,6 +904,8 @@ export default function Admin() {
     }
   }, []);
 
+ 
+
   if (!authed) {
     return <LoginGate onSuccess={(username) => {
       sessionStorage.setItem("gi_admin_user", username);
@@ -871,7 +927,7 @@ export default function Admin() {
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="font-bold text-lg">Admin Panel</span>
-            <span className="text-muted-foreground text-sm hidden sm:inline">· GambiaInfluencers</span>
+            <span className="text-muted-foreground text-sm hidden sm:inline">· GamInfluencers</span>
           </div>
           <div className="flex items-center gap-2">
             {adminUsername && (
