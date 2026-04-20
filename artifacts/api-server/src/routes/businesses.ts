@@ -34,7 +34,7 @@ router.get("/businesses", async (_req, res): Promise<void> => {
   res.json(ListBusinessesResponse.parse(businesses.map(serializeBusiness)));
 });
 
-router.post("/businesses", requireAdmin, async (req, res): Promise<void> => {
+router.post("/businesses", async (req, res): Promise<void> => {
   const parsed = CreateBusinessBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

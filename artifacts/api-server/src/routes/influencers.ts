@@ -64,7 +64,7 @@ router.get("/influencers", async (req, res): Promise<void> => {
   res.json(ListInfluencersResponse.parse(influencers.map(serializeInfluencer)));
 });
 
-router.post("/influencers", requireAdmin, async (req, res): Promise<void> => {
+router.post("/influencers", async (req, res): Promise<void> => {
   const parsed = CreateInfluencerBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
