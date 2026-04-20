@@ -1,9 +1,8 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
-  version: 0.1.0
-  description: GambiaInfluence API specification
+  version: 0.2.0
+  description: Unified API for GambiaInfluencers and Our Influencers platforms
 servers:
   - url: /api
     description: Base API path
@@ -16,13 +15,20 @@ tags:
     description: Business operations
   - name: stats
     description: Platform statistics
+  - name: auth
+    description: Authentication
+  - name: users
+    description: User management
+  - name: campaigns
+    description: Campaign management
+  - name: quickPromotions
+    description: Quick promotion requests
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -41,17 +47,14 @@ paths:
           name: location
           schema:
             type: string
-          description: Filter by location
         - in: query
           name: niche
           schema:
             type: string
-          description: Filter by niche
         - in: query
           name: search
           schema:
             type: string
-          description: Search by name
       responses:
         "200":
           description: List of influencers
@@ -78,8 +81,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Influencer"
-        "400":
-          description: Bad request
+
+  /influencers/top:
+    get:
+      operationId: getTopInfluencers
+      tags: [influencers]
+      summary: Get top influencers by follower count
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Top influencers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Influencer"
 
   /influencers/{id}:
     get:
@@ -124,8 +145,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Influencer"
-        "404":
-          description: Not found
     delete:
       operationId: deleteInfluencer
       tags: [influencers]
@@ -139,8 +158,6 @@ paths:
       responses:
         "204":
           description: Deleted
-        "404":
-          description: Not found
 
   /businesses:
     get:
@@ -173,8 +190,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Business"
-        "400":
-          description: Bad request
 
   /businesses/{id}:
     get:
@@ -194,8 +209,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Business"
-        "404":
-          description: Not found
     patch:
       operationId: updateBusiness
       tags: [businesses]
@@ -219,8 +232,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Business"
-        "404":
-          description: Not found
     delete:
       operationId: deleteBusiness
       tags: [businesses]
@@ -234,8 +245,6 @@ paths:
       responses:
         "204":
           description: Deleted
-        "404":
-          description: Not found
 
   /stats/platform:
     get:
@@ -280,26 +289,278 @@ paths:
                 items:
                   $ref: "#/components/schemas/LocationCount"
 
-  /influencers/top:
-    get:
-      operationId: getTopInfluencers
-      tags: [influencers]
-      summary: Get top influencers by follower count
-      parameters:
-        - in: query
-          name: limit
-          schema:
-            type: integer
-          description: Number of top influencers to return
+  # ─── Our Influencers: Auth ───────────────────────────────────────────────────
+
+  /oi/auth/login:
+    post:
+      operationId: oiLogin
+      tags: [auth]
+      summary: Login as admin or client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OiLoginBody"
       responses:
         "200":
-          description: Top influencers
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OiAuthResponse"
+        "401":
+          description: Invalid credentials
+
+  /oi/auth/me:
+    get:
+      operationId: oiGetMe
+      tags: [auth]
+      summary: Get current authenticated user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OiUser"
+        "401":
+          description: Unauthorized
+
+  # ─── Our Influencers: Users ──────────────────────────────────────────────────
+
+  /oi/users:
+    get:
+      operationId: oiListUsers
+      tags: [users]
+      summary: List all users (admin only)
+      responses:
+        "200":
+          description: List of users
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Influencer"
+                  $ref: "#/components/schemas/OiUser"
+    post:
+      operationId: oiCreateUser
+      tags: [users]
+      summary: Create admin or client user (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OiCreateUserBody"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OiUser"
+
+  /oi/users/{id}:
+    patch:
+      operationId: oiUpdateUser
+      tags: [users]
+      summary: Update user (admin only)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OiUpdateUserBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OiUser"
+    delete:
+      operationId: oiDeleteUser
+      tags: [users]
+      summary: Delete user (admin only)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ─── Our Influencers: Campaigns ──────────────────────────────────────────────
+
+  /oi/campaigns:
+    get:
+      operationId: oiListCampaigns
+      tags: [campaigns]
+      summary: List campaigns (admin sees all, client sees own)
+      responses:
+        "200":
+          description: List of campaigns
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OiCampaign"
+    post:
+      operationId: oiCreateCampaign
+      tags: [campaigns]
+      summary: Create campaign (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OiCreateCampaignBody"
+      responses:
+        "201":
+          description: Campaign created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OiCampaign"
+
+  /oi/campaigns/{id}:
+    get:
+      operationId: oiGetCampaign
+      tags: [campaigns]
+      summary: Get campaign details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Campaign found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OiCampaignDetail"
+        "404":
+          description: Not found
+    patch:
+      operationId: oiUpdateCampaign
+      tags: [campaigns]
+      summary: Update campaign status or post URL (admin only)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OiUpdateCampaignBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OiCampaign"
+    delete:
+      operationId: oiDeleteCampaign
+      tags: [campaigns]
+      summary: Delete campaign (admin only)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /oi/campaigns/stats/summary:
+    get:
+      operationId: oiGetCampaignSummary
+      tags: [campaigns]
+      summary: Get campaign statistics summary
+      responses:
+        "200":
+          description: Campaign summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OiCampaignSummary"
+
+  # ─── Our Influencers: Quick Promotions ───────────────────────────────────────
+
+  /oi/quick-promotions:
+    get:
+      operationId: oiListQuickPromotions
+      tags: [quickPromotions]
+      summary: List quick promotion requests (admin only)
+      responses:
+        "200":
+          description: List of quick promotions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OiQuickPromotion"
+    post:
+      operationId: oiCreateQuickPromotion
+      tags: [quickPromotions]
+      summary: Submit a quick promotion request (no auth required)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OiCreateQuickPromotionBody"
+      responses:
+        "201":
+          description: Quick promotion submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OiQuickPromotion"
+
+  /oi/quick-promotions/{id}:
+    patch:
+      operationId: oiUpdateQuickPromotion
+      tags: [quickPromotions]
+      summary: Update quick promotion status (admin only)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OiUpdateQuickPromotionBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OiQuickPromotion"
 
 components:
   schemas:
@@ -308,8 +569,7 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
     Influencer:
       type: object
@@ -342,21 +602,7 @@ components:
           type: string
         updatedAt:
           type: string
-      required:
-        - id
-        - name
-        - location
-        - niche
-        - followersCount
-        - instagramUrl
-        - tiktokUrl
-        - youtubeUrl
-        - phone
-        - whatsappNumber
-        - bio
-        - profileImageUrl
-        - createdAt
-        - updatedAt
+      required: [id, name, location, niche, followersCount, instagramUrl, tiktokUrl, youtubeUrl, phone, whatsappNumber, bio, profileImageUrl, createdAt, updatedAt]
 
     CreateInfluencerBody:
       type: object
@@ -383,11 +629,7 @@ components:
           type: ["string", "null"]
         profileImageUrl:
           type: ["string", "null"]
-      required:
-        - name
-        - location
-        - niche
-        - followersCount
+      required: [name, location, niche, followersCount]
 
     UpdateInfluencerBody:
       type: object
@@ -438,17 +680,7 @@ components:
           type: string
         updatedAt:
           type: string
-      required:
-        - id
-        - businessName
-        - businessType
-        - contactEmail
-        - contactPhone
-        - location
-        - description
-        - website
-        - createdAt
-        - updatedAt
+      required: [id, businessName, businessType, contactEmail, contactPhone, location, description, website, createdAt, updatedAt]
 
     CreateBusinessBody:
       type: object
@@ -467,9 +699,7 @@ components:
           type: ["string", "null"]
         website:
           type: ["string", "null"]
-      required:
-        - businessName
-        - businessType
+      required: [businessName, businessType]
 
     UpdateBusinessBody:
       type: object
@@ -502,12 +732,7 @@ components:
           type: string
         topLocation:
           type: string
-      required:
-        - totalInfluencers
-        - totalBusinesses
-        - totalFollowers
-        - topNiche
-        - topLocation
+      required: [totalInfluencers, totalBusinesses, totalFollowers, topNiche, topLocation]
 
     NicheCount:
       type: object
@@ -516,9 +741,7 @@ components:
           type: string
         count:
           type: integer
-      required:
-        - niche
-        - count
+      required: [niche, count]
 
     LocationCount:
       type: object
@@ -527,6 +750,239 @@ components:
           type: string
         count:
           type: integer
-      required:
-        - location
-        - count
+      required: [location, count]
+
+    # ─── Our Influencers Schemas ─────────────────────────────────────────────
+
+    OiLoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required: [email, password]
+
+    OiAuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/OiUser"
+      required: [token, user]
+
+    OiUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        fullName:
+          type: string
+        role:
+          type: string
+          enum: [admin, client]
+        companyName:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required: [id, email, fullName, role, companyName, phone, createdAt]
+
+    OiCreateUserBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        fullName:
+          type: string
+        role:
+          type: string
+          enum: [admin, client]
+        companyName:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+      required: [email, password, fullName, role]
+
+    OiUpdateUserBody:
+      type: object
+      properties:
+        email:
+          type: string
+        fullName:
+          type: string
+        companyName:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        password:
+          type: ["string", "null"]
+
+    OiCampaign:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        budget:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, active, posted, completed, cancelled]
+        postUrl:
+          type: ["string", "null"]
+        postedAt:
+          type: ["string", "null"]
+        clientId:
+          type: integer
+        influencerId:
+          type: integer
+        clientName:
+          type: ["string", "null"]
+        influencerName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, title, status, clientId, influencerId, createdAt, updatedAt]
+
+    OiCampaignDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        budget:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, active, posted, completed, cancelled]
+        postUrl:
+          type: ["string", "null"]
+        postedAt:
+          type: ["string", "null"]
+        clientId:
+          type: integer
+        influencerId:
+          type: integer
+        client:
+          $ref: "#/components/schemas/OiUser"
+        influencer:
+          $ref: "#/components/schemas/Influencer"
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, title, status, clientId, influencerId, createdAt, updatedAt]
+
+    OiCreateCampaignBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        budget:
+          type: ["string", "null"]
+        clientId:
+          type: integer
+        influencerId:
+          type: integer
+      required: [title, clientId, influencerId]
+
+    OiUpdateCampaignBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        budget:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, active, posted, completed, cancelled]
+        postUrl:
+          type: ["string", "null"]
+
+    OiCampaignSummary:
+      type: object
+      properties:
+        total:
+          type: integer
+        pending:
+          type: integer
+        active:
+          type: integer
+        posted:
+          type: integer
+        completed:
+          type: integer
+        cancelled:
+          type: integer
+        totalBudget:
+          type: string
+      required: [total, pending, active, posted, completed, cancelled, totalBudget]
+
+    OiQuickPromotion:
+      type: object
+      properties:
+        id:
+          type: integer
+        influencerId:
+          type: integer
+        influencerName:
+          type: ["string", "null"]
+        contactName:
+          type: string
+        contactEmail:
+          type: ["string", "null"]
+        contactPhone:
+          type: ["string", "null"]
+        description:
+          type: string
+        promoType:
+          type: string
+        status:
+          type: string
+          enum: [new, contacted, in_progress, done]
+        createdAt:
+          type: string
+      required: [id, influencerId, contactName, description, promoType, status, createdAt]
+
+    OiCreateQuickPromotionBody:
+      type: object
+      properties:
+        influencerId:
+          type: integer
+        contactName:
+          type: string
+        contactEmail:
+          type: ["string", "null"]
+        contactPhone:
+          type: ["string", "null"]
+        description:
+          type: string
+        promoType:
+          type: string
+      required: [influencerId, contactName, description, promoType]
+
+    OiUpdateQuickPromotionBody:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [new, contacted, in_progress, done]

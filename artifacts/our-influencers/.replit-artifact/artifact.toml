@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/our-influencers/"
+title = "Our Influencers"
+version = "1.0.0"
+id = "artifacts/our-influencers"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/our-influencers/" ]
+localPort = 24317
+
+[services.development]
+run = "pnpm --filter @workspace/our-influencers run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/our-influencers", "run", "build" ]
+publicDir = "artifacts/our-influencers/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24317"
+BASE_PATH = "/our-influencers/"
