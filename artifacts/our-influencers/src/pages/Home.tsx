@@ -249,7 +249,7 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-14">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Our Influencers</h2>
+            <h2 className="text-2xl font-bold text-foreground">Browse Influencers</h2>
             <p className="text-muted-foreground mt-1">Browse creators available for partnerships</p>
           </div>
           <div className="relative w-full sm:w-64">
@@ -316,9 +316,9 @@ export default function Home() {
               <div className="w-7 h-7 bg-primary rounded-md flex items-center justify-center">
                 <Star className="w-3.5 h-3.5 text-white fill-white" />
               </div>
-              <span className="font-bold">Our<span className="text-primary">Influencers</span></span>
+              <span className="font-bold">Influenza</span>
             </div>
-            <p className="text-xs text-white/40">© {new Date().getFullYear()} OurInfluencers. All rights reserved.</p>
+            <p className="text-xs text-white/40">© {new Date().getFullYear()} Influenza. All rights reserved.</p>
           </div>
         </div>
       </footer>
