@@ -25,7 +25,7 @@ export default function Navbar() {
             <Star className="w-4 h-4 text-white fill-white" />
           </div>
           <span className="text-xl font-bold text-foreground tracking-tight">
-            Influenza
+            GamInfluenza
           </span>
         </Link>
 

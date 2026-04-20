@@ -5,7 +5,7 @@
 This monorepo hosts two separate influencer marketing platforms:
 
 1. **GambiaInfluence** (`artifacts/gambia-influence`) — a public-facing platform for connecting Gambian businesses with local content creators.
-2. **Influenza** (`artifacts/our-influencers`) — a premium enterprise influencer marketing hub where the operator is the primary admin. Admin-managed accounts, full campaign lifecycle tracking, and anonymous quick-promotion requests.
+2. **GamInfluenza** (`artifacts/our-influencers`) — a premium enterprise influencer marketing hub where the operator is the primary admin. Admin-managed accounts, full campaign lifecycle tracking, and anonymous quick-promotion requests.
 
 Both share the same API server (`artifacts/api-server`) and DB libraries.
 

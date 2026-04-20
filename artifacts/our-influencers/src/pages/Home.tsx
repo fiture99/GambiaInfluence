@@ -316,9 +316,9 @@ export default function Home() {
               <div className="w-7 h-7 bg-primary rounded-md flex items-center justify-center">
                 <Star className="w-3.5 h-3.5 text-white fill-white" />
               </div>
-              <span className="font-bold">Influenza</span>
+              <span className="font-bold">GamInfluenza</span>
             </div>
-            <p className="text-xs text-white/40">© {new Date().getFullYear()} Influenza. All rights reserved.</p>
+            <p className="text-xs text-white/40">© {new Date().getFullYear()} GamInfluenza. All rights reserved.</p>
           </div>
         </div>
       </footer>

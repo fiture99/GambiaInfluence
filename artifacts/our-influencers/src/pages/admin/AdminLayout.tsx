@@ -46,7 +46,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
             <Star className="w-3.5 h-3.5 text-white fill-white" />
           </div>
           <span className="font-bold text-sm">
-            Influenza
+            GamInfluenza
           </span>
         </Link>
         {onClose && (
@@ -118,7 +118,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="w-6 h-6 bg-sidebar-primary rounded-md flex items-center justify-center">
               <Star className="w-3 h-3 text-white fill-white" />
             </div>
-            <span className="font-bold text-sm">Influenza</span>
+            <span className="font-bold text-sm">GamInfluenza</span>
           </div>
           <Badge className="ml-2 text-xs bg-sidebar-primary/20 text-sidebar-primary border-0">Admin</Badge>
         </div>

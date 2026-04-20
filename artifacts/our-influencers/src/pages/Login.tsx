@@ -43,7 +43,7 @@ export default function Login() {
               <Star className="w-5 h-5 text-white fill-white" />
             </div>
             <span className="text-2xl font-bold tracking-tight">
-              Influenza
+              GamInfluenza
             </span>
           </Link>
           <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
