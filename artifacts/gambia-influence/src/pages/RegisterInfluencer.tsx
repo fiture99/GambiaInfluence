@@ -87,7 +87,7 @@ export default function RegisterInfluencer() {
       {
         onSuccess: (data) => {
           toast({
-            title: "Welcome to GamInfluencers!",
+            title: "Welcome to GamInfluenza!",
             description: "Your creator profile has been created successfully.",
           });
           setLocation(`/influencers/${data.id}`);

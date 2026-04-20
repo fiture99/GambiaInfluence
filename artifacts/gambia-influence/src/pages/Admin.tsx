@@ -845,7 +845,7 @@ function LoginGate({ onSuccess }: { onSuccess: (username: string) => void }) {
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <span className="text-2xl font-black text-primary tracking-tighter">GamInfluencers</span>
+          <span className="text-2xl font-black text-primary tracking-tighter">GamInfluenza</span>
           <p className="mt-2 text-muted-foreground text-sm">Admin access only</p>
         </div>
         <div className="border rounded-xl p-6 bg-card shadow-sm">
@@ -927,7 +927,7 @@ export default function Admin() {
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="font-bold text-lg">Admin Panel</span>
-            <span className="text-muted-foreground text-sm hidden sm:inline">· GamInfluencers</span>
+            <span className="text-muted-foreground text-sm hidden sm:inline">· GamInfluenza</span>
           </div>
           <div className="flex items-center gap-2">
             {adminUsername && (
