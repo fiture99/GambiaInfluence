@@ -79,19 +79,23 @@ export default function InfluencerProfile() {
   const [errors, setErrors] = useState<FormErrors>({});
 
   function togglePromoType(type: string) {
-    setForm(prev => ({
-      ...prev,
-      promoTypes: prev.promoTypes.includes(type)
-        ? prev.promoTypes.filter(t => t !== type)
-        : [...prev.promoTypes, type],
-    }));
+    setForm(prev => {
+      const current = prev.promoTypes ?? [];
+      return {
+        ...prev,
+        promoTypes: current.includes(type)
+          ? current.filter(t => t !== type)
+          : [...current, type],
+      };
+    });
     setErrors(prev => ({ ...prev, promoTypes: undefined }));
   }
 
   function validate(): boolean {
     const e: FormErrors = {};
+    const promoTypes = form.promoTypes ?? [];
     if (!form.contactName.trim()) e.contactName = "Your name is required";
-    if (form.promoTypes.length === 0) e.promoTypes = "Select at least one promotion type";
+    if (promoTypes.length === 0) e.promoTypes = "Select at least one promotion type";
     if (!form.description.trim()) e.description = "Please describe what you want promoted";
     if (form.description.trim().length > 0 && form.description.trim().length < 20)
       e.description = "Please give more detail (at least 20 characters)";
@@ -112,7 +116,7 @@ export default function InfluencerProfile() {
           contactName: form.contactName,
           contactEmail: form.contactEmail || undefined,
           contactPhone: form.contactPhone || undefined,
-          promoType: form.promoTypes.join(", "),
+          promoType: (form.promoTypes ?? []).join(", "),
           description: form.description,
         }),
       });
@@ -370,7 +374,7 @@ export default function InfluencerProfile() {
               </Label>
               <div className="flex flex-wrap gap-2">
                 {PROMO_TYPES.map(type => {
-                  const selected = form.promoTypes.includes(type);
+                  const selected = (form.promoTypes ?? []).includes(type);
                   return (
                     <button
                       key={type}
@@ -389,9 +393,9 @@ export default function InfluencerProfile() {
                   );
                 })}
               </div>
-              {form.promoTypes.length > 0 && (
+              {(form.promoTypes ?? []).length > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  {form.promoTypes.length} type{form.promoTypes.length > 1 ? "s" : ""} selected
+                  {(form.promoTypes ?? []).length} type{(form.promoTypes ?? []).length > 1 ? "s" : ""} selected
                 </p>
               )}
               {errors.promoTypes && <p className="text-destructive text-xs">{errors.promoTypes}</p>}
