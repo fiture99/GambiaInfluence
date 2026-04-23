@@ -58,7 +58,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Pencil, Trash2, Plus, ArrowLeft, Users, Building2 } from "lucide-react";
+import { Pencil, Trash2, Plus, ArrowLeft, Users, Building2, Megaphone, RefreshCw, Phone, Mail } from "lucide-react";
 
 const GAMBIAN_CITIES = [
   "Banjul", "Serekunda", "Bakau", "Brikama", "Kanifing",
@@ -788,6 +788,174 @@ function BusinessesTab() {
   );
 }
 
+// ─── Promo Requests Tab ───────────────────────────────────────────────────────
+
+interface PromoRequest {
+  id: number;
+  influencerId: number;
+  influencerName: string | null;
+  contactName: string;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  description: string;
+  promoType: string;
+  status: "new" | "contacted" | "in_progress" | "done";
+  createdAt: string;
+}
+
+const STATUS_LABELS: Record<PromoRequest["status"], string> = {
+  new: "New",
+  contacted: "Contacted",
+  in_progress: "In Progress",
+  done: "Done",
+};
+const STATUS_COLORS: Record<PromoRequest["status"], string> = {
+  new: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+  contacted: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300",
+  in_progress: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
+  done: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
+};
+
+function RequestsTab() {
+  const { toast } = useToast();
+  const [requests, setRequests] = useState<PromoRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState<number | null>(null);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const token = sessionStorage.getItem(SESSION_KEY);
+      const res = await fetch("/api/promo-requests", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to load");
+      const data = (await res.json()) as PromoRequest[];
+      setRequests(data);
+    } catch {
+      toast({ title: "Failed to load requests", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { void load(); }, []);
+
+  async function updateStatus(id: number, status: PromoRequest["status"]) {
+    setUpdating(id);
+    try {
+      const token = sessionStorage.getItem(SESSION_KEY);
+      const res = await fetch(`/api/promo-requests/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error("Failed to update");
+      const updated = (await res.json()) as PromoRequest;
+      setRequests(prev => prev.map(r => (r.id === id ? updated : r)));
+      toast({ title: "Status updated" });
+    } catch {
+      toast({ title: "Failed to update status", variant: "destructive" });
+    } finally {
+      setUpdating(null);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map(i => <Skeleton key={i} className="h-28 w-full rounded-xl" />)}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-bold">Promotion Requests</h2>
+          <p className="text-sm text-muted-foreground">{requests.length} total request{requests.length !== 1 ? "s" : ""}</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={() => void load()} className="gap-2">
+          <RefreshCw className="w-4 h-4" /> Refresh
+        </Button>
+      </div>
+
+      {requests.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground border rounded-xl">
+          <Megaphone className="w-12 h-12 mx-auto mb-4 opacity-30" />
+          <p className="font-medium">No requests yet</p>
+          <p className="text-sm mt-1">Promotion requests from influencer profiles will appear here.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {requests.map(r => (
+            <div key={r.id} className="border rounded-xl p-5 bg-card hover:shadow-sm transition-shadow">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${STATUS_COLORS[r.status]}`}>
+                      {STATUS_LABELS[r.status]}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(r.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                    </span>
+                    <Badge variant="outline" className="text-xs">{r.promoType}</Badge>
+                  </div>
+
+                  <p className="font-semibold text-base">
+                    {r.influencerName ?? `Influencer #${r.influencerId}`}
+                    <span className="text-muted-foreground font-normal"> · requested by </span>
+                    {r.contactName}
+                  </p>
+
+                  <div className="flex flex-wrap gap-4 mt-1 text-sm text-muted-foreground">
+                    {r.contactEmail && (
+                      <a href={`mailto:${r.contactEmail}`} className="flex items-center gap-1 hover:text-primary">
+                        <Mail className="w-3.5 h-3.5" /> {r.contactEmail}
+                      </a>
+                    )}
+                    {r.contactPhone && (
+                      <a href={`tel:${r.contactPhone}`} className="flex items-center gap-1 hover:text-primary">
+                        <Phone className="w-3.5 h-3.5" /> {r.contactPhone}
+                      </a>
+                    )}
+                  </div>
+
+                  <p className="mt-3 text-sm text-foreground/80 bg-muted/40 rounded-lg p-3 leading-relaxed">
+                    {r.description}
+                  </p>
+                </div>
+
+                <div className="sm:shrink-0">
+                  <Select
+                    value={r.status}
+                    onValueChange={v => void updateStatus(r.id, v as PromoRequest["status"])}
+                    disabled={updating === r.id}
+                  >
+                    <SelectTrigger className="w-[150px] text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="new">New</SelectItem>
+                      <SelectItem value="contacted">Contacted</SelectItem>
+                      <SelectItem value="in_progress">In Progress</SelectItem>
+                      <SelectItem value="done">Done</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
 const SESSION_KEY = "gi_admin_token";
@@ -956,6 +1124,9 @@ export default function Admin() {
             <TabsTrigger value="businesses" className="gap-2">
               <Building2 className="w-4 h-4" /> Businesses
             </TabsTrigger>
+            <TabsTrigger value="requests" className="gap-2">
+              <Megaphone className="w-4 h-4" /> Requests
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="influencers">
@@ -964,6 +1135,10 @@ export default function Admin() {
 
           <TabsContent value="businesses">
             <BusinessesTab />
+          </TabsContent>
+
+          <TabsContent value="requests">
+            <RequestsTab />
           </TabsContent>
         </Tabs>
       </main>

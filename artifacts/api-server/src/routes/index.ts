@@ -8,6 +8,7 @@ import oiAuthRouter from "./oi-auth";
 import oiUsersRouter from "./oi-users";
 import oiCampaignsRouter from "./oi-campaigns";
 import oiQuickPromotionsRouter from "./oi-quick-promotions";
+import promoRequestsRouter from "./promo-requests";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(oiAuthRouter);
 router.use(oiUsersRouter);
 router.use(oiCampaignsRouter);
 router.use(oiQuickPromotionsRouter);
+router.use(promoRequestsRouter);
 
 export default router;
