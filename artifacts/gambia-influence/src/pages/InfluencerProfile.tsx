@@ -14,13 +14,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import {
   MapPin,
@@ -31,8 +24,10 @@ import {
   Megaphone,
   CheckCircle2,
   ArrowLeft,
+  Check,
 } from "lucide-react";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const PROMO_TYPES = [
   "Instagram Post",
@@ -51,7 +46,7 @@ interface PromoRequestForm {
   contactName: string;
   contactEmail: string;
   contactPhone: string;
-  promoType: string;
+  promoTypes: string[];
   description: string;
 }
 
@@ -59,9 +54,15 @@ const empty: PromoRequestForm = {
   contactName: "",
   contactEmail: "",
   contactPhone: "",
-  promoType: "",
+  promoTypes: [],
   description: "",
 };
+
+interface FormErrors {
+  contactName?: string;
+  promoTypes?: string;
+  description?: string;
+}
 
 export default function InfluencerProfile() {
   const [, params] = useRoute("/influencers/:id");
@@ -75,14 +76,25 @@ export default function InfluencerProfile() {
   const [successOpen, setSuccessOpen] = useState(false);
   const [form, setForm] = useState<PromoRequestForm>(empty);
   const [submitting, setSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Partial<PromoRequestForm>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  function togglePromoType(type: string) {
+    setForm(prev => ({
+      ...prev,
+      promoTypes: prev.promoTypes.includes(type)
+        ? prev.promoTypes.filter(t => t !== type)
+        : [...prev.promoTypes, type],
+    }));
+    setErrors(prev => ({ ...prev, promoTypes: undefined }));
+  }
 
   function validate(): boolean {
-    const e: Partial<PromoRequestForm> = {};
+    const e: FormErrors = {};
     if (!form.contactName.trim()) e.contactName = "Your name is required";
-    if (!form.promoType) e.promoType = "Select a promotion type";
+    if (form.promoTypes.length === 0) e.promoTypes = "Select at least one promotion type";
     if (!form.description.trim()) e.description = "Please describe what you want promoted";
-    if (form.description.trim().length < 20) e.description = "Please give more detail (at least 20 characters)";
+    if (form.description.trim().length > 0 && form.description.trim().length < 20)
+      e.description = "Please give more detail (at least 20 characters)";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -100,7 +112,7 @@ export default function InfluencerProfile() {
           contactName: form.contactName,
           contactEmail: form.contactEmail || undefined,
           contactPhone: form.contactPhone || undefined,
-          promoType: form.promoType,
+          promoType: form.promoTypes.join(", "),
           description: form.description,
         }),
       });
@@ -120,7 +132,7 @@ export default function InfluencerProfile() {
     }
   }
 
-  function field(k: keyof PromoRequestForm, value: string) {
+  function field(k: keyof Omit<PromoRequestForm, "promoTypes">, value: string) {
     setForm(prev => ({ ...prev, [k]: value }));
     setErrors(prev => ({ ...prev, [k]: undefined }));
   }
@@ -298,9 +310,9 @@ export default function InfluencerProfile() {
         </div>
       </div>
 
-      {/* Request Promotion Modal */}
+      {/* ── Request Promotion Modal ───────────────────────────────── */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <Megaphone className="w-5 h-5 text-primary" />
@@ -312,9 +324,12 @@ export default function InfluencerProfile() {
             </p>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+          <form onSubmit={handleSubmit} className="space-y-5 mt-2">
+            {/* Name */}
             <div className="space-y-1.5">
-              <Label htmlFor="contactName">Your Name <span className="text-destructive">*</span></Label>
+              <Label htmlFor="contactName">
+                Your Name <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="contactName"
                 placeholder="e.g. Aminata Jallow"
@@ -324,6 +339,7 @@ export default function InfluencerProfile() {
               {errors.contactName && <p className="text-destructive text-xs">{errors.contactName}</p>}
             </div>
 
+            {/* Email + Phone */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="contactEmail">Email</Label>
@@ -346,23 +362,46 @@ export default function InfluencerProfile() {
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label>Promotion Type <span className="text-destructive">*</span></Label>
-              <Select value={form.promoType} onValueChange={v => field("promoType", v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose type of promotion..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {PROMO_TYPES.map(t => (
-                    <SelectItem key={t} value={t}>{t}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.promoType && <p className="text-destructive text-xs">{errors.promoType}</p>}
+            {/* Multi-select Promotion Types */}
+            <div className="space-y-2">
+              <Label>
+                Promotion Type <span className="text-destructive">*</span>
+                <span className="text-muted-foreground font-normal ml-1">(select all that apply)</span>
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                {PROMO_TYPES.map(type => {
+                  const selected = form.promoTypes.includes(type);
+                  return (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => togglePromoType(type)}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all",
+                        selected
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                          : "bg-background text-foreground border-border hover:border-primary hover:text-primary"
+                      )}
+                    >
+                      {selected && <Check className="w-3.5 h-3.5" />}
+                      {type}
+                    </button>
+                  );
+                })}
+              </div>
+              {form.promoTypes.length > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  {form.promoTypes.length} type{form.promoTypes.length > 1 ? "s" : ""} selected
+                </p>
+              )}
+              {errors.promoTypes && <p className="text-destructive text-xs">{errors.promoTypes}</p>}
             </div>
 
+            {/* Description */}
             <div className="space-y-1.5">
-              <Label htmlFor="description">What Do You Want Promoted? <span className="text-destructive">*</span></Label>
+              <Label htmlFor="description">
+                What Do You Want Promoted? <span className="text-destructive">*</span>
+              </Label>
               <Textarea
                 id="description"
                 placeholder="Describe your product or service and what you'd like the influencer to say or show. The more detail you give, the better we can help you."
@@ -385,7 +424,7 @@ export default function InfluencerProfile() {
         </DialogContent>
       </Dialog>
 
-      {/* Success Dialog */}
+      {/* ── Success Dialog ───────────────────────────────────────── */}
       <Dialog open={successOpen} onOpenChange={setSuccessOpen}>
         <DialogContent className="max-w-sm text-center">
           <div className="flex flex-col items-center gap-4 py-4">
@@ -398,9 +437,7 @@ export default function InfluencerProfile() {
                 Your promotion request has been received. Our team will review it and reach out to you within 24 hours to discuss next steps.
               </p>
             </div>
-            <Button onClick={() => setSuccessOpen(false)} className="w-full">
-              Done
-            </Button>
+            <Button onClick={() => setSuccessOpen(false)} className="w-full">Done</Button>
           </div>
         </DialogContent>
       </Dialog>
