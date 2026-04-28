@@ -8,6 +8,7 @@ if (!rawPort) {
     "PORT environment variable is required but was not provided.",
   );
 }
+console.log("ENV CHECK - ADMIN_PASSWORD:", process.env.ADMIN_PASSWORD ?? "NOT SET");
 
 const port = Number(rawPort);
 

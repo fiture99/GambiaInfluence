@@ -74,7 +74,7 @@ export default defineConfig({
     allowedHosts: true,
     proxy: {
       "/api/": {
-        target: "http://localhost:8081",
+        target: "https://gambiainfluence.onrender.com",
         // rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
