@@ -76,6 +76,8 @@ export default defineConfig({
       "/api/": {
         target: "https://gambiainfluence.onrender.com",
         // rewrite: (path) => path.replace(/^\/api/, ""),
+        secure: false,
+        changeOrigin: true,
       },
     },
     fs: {
