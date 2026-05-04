@@ -244,7 +244,7 @@ export default function RegisterBusiness() {
                 <Button 
                   type="submit" 
                   size="lg" 
-                  className="w-full md:w-auto h-14 px-10 text-lg font-bold rounded-xl hover-elevate"
+                  className="w-full md:w-aut bg-blue-900 border-blue-900 h-14 px-10 text-lg font-bold rounded-xl hover-elevate"
                   disabled={createBusiness.isPending}
                 >
                   {createBusiness.isPending ? "Registering..." : "Register Business"}

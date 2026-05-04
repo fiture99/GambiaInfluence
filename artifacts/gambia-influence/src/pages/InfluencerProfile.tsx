@@ -144,7 +144,7 @@ export default function InfluencerProfile() {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-12 flex-1 flex justify-center items-center">
-        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        <div className="w-16 h-16 border-4 border-blue-900 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -162,20 +162,20 @@ export default function InfluencerProfile() {
   return (
     <div className="container mx-auto px-4 py-12 flex-1 max-w-5xl">
       <Link href="/influencers">
-        <Button variant="ghost" className="mb-8 pl-0 hover:bg-transparent hover:text-primary">
+        <Button variant="ghost" className="mb-8 pl-0 hover:bg-transparent hover:text-blue-900">
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Directory
         </Button>
       </Link>
 
       <div className="bg-card border rounded-3xl overflow-hidden shadow-sm">
         {/* Cover Banner */}
-        <div className="h-48 md:h-64 bg-gradient-to-r from-primary via-accent to-secondary opacity-80" />
+        <div className="h-48 md:h-64 bg-gradient-to-r from-blue-900 via-accent to-secondary opacity-80" />
 
         <div className="px-6 md:px-12 pb-12 relative">
           <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start -mt-20 md:-mt-24 mb-8">
             <Avatar className="h-40 w-40 md:h-48 md:w-48 border-8 border-card shadow-lg bg-background">
               <AvatarImage src={influencer.profileImageUrl || undefined} alt={influencer.name} className="object-cover" />
-              <AvatarFallback className="text-5xl font-black text-primary bg-primary/10">
+              <AvatarFallback className="text-5xl font-black text-blue-900 bg-blue-900/10">
                 {influencer.name.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
@@ -196,7 +196,7 @@ export default function InfluencerProfile() {
                     <Badge variant="secondary" className="bg-secondary/15 text-secondary-foreground hover:bg-secondary/25 text-sm py-1 px-3">
                       {influencer.niche}
                     </Badge>
-                    <Badge variant="outline" className="text-sm py-1 px-3 border-primary/30 text-primary">
+                    <Badge variant="outline" className="text-sm py-1 px-3 border-blue-900/30 text-blue-900">
                       <Users className="w-3.5 h-3.5 mr-1.5" />
                       {(influencer.followersCount || 0).toLocaleString()} Followers
                     </Badge>
@@ -207,10 +207,10 @@ export default function InfluencerProfile() {
                 <div className="flex flex-col gap-3 min-w-[220px]">
                   <Button
                     size="lg"
-                    className="w-full h-12 text-base font-bold shadow-md"
+                    className="w-full h-12 text-base font-bold bg-blue-900 border-blue-900 shadow-md"
                     onClick={() => setModalOpen(true)}
                   >
-                    <Megaphone className="w-5 h-5 mr-2" />
+                    <Megaphone className="w-5 h-5  mr-2" />
                     Request Promotion
                   </Button>
                   <p className="text-xs text-muted-foreground text-center">
@@ -232,19 +232,19 @@ export default function InfluencerProfile() {
               </section>
 
               {/* How it works */}
-              <section className="bg-primary/5 rounded-2xl p-6 border border-primary/10">
-                <h3 className="font-bold text-lg mb-4 text-primary">How Promotion Requests Work</h3>
+              <section className="bg-blue-900/5 rounded-2xl p-6 border border-blue-900/10">
+                <h3 className="font-bold text-lg mb-4 text-blue-900">How Promotion Requests Work</h3>
                 <ol className="space-y-3 text-sm text-muted-foreground">
                   <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shrink-0">1</span>
+                    <span className="w-6 h-6 rounded-full bg-blue-900 text-white text-blue-900-foreground text-xs font-bold flex items-center justify-center shrink-0">1</span>
                     Click "Request Promotion" and fill in your details
                   </li>
                   <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shrink-0">2</span>
+                    <span className="w-6 h-6 rounded-full bg-blue-900 text-white text-blue-900-foreground text-xs font-bold flex items-center justify-center shrink-0">2</span>
                     Our team reviews your request and contacts you within 24 hours
                   </li>
                   <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shrink-0">3</span>
+                    <span className="w-6 h-6 rounded-full bg-blue-900 text-white text-blue-900-foreground text-xs font-bold flex items-center justify-center shrink-0">3</span>
                     We coordinate the campaign and verify the post goes live
                   </li>
                 </ol>
@@ -277,7 +277,7 @@ export default function InfluencerProfile() {
                 <div className="space-y-3">
                   {influencer.instagramUrl && (
                     <a href={influencer.instagramUrl} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center p-3 rounded-xl bg-background border hover:border-primary transition-colors group">
+                      className="flex items-center p-3 rounded-xl bg-background border hover:border-blue-900 transition-colors group">
                       <div className="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-600 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
                         <Instagram className="w-5 h-5" />
                       </div>
@@ -286,7 +286,7 @@ export default function InfluencerProfile() {
                   )}
                   {influencer.tiktokUrl && (
                     <a href={influencer.tiktokUrl} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center p-3 rounded-xl bg-background border hover:border-primary transition-colors group">
+                      className="flex items-center p-3 rounded-xl bg-background border hover:border-blue-900 transition-colors group">
                       <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
@@ -297,7 +297,7 @@ export default function InfluencerProfile() {
                   )}
                   {influencer.youtubeUrl && (
                     <a href={influencer.youtubeUrl} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center p-3 rounded-xl bg-background border hover:border-primary transition-colors group">
+                      className="flex items-center p-3 rounded-xl bg-background border hover:border-blue-900 transition-colors group">
                       <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
                         <Youtube className="w-5 h-5" />
                       </div>
@@ -319,7 +319,7 @@ export default function InfluencerProfile() {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
-              <Megaphone className="w-5 h-5 text-primary" />
+              <Megaphone className="w-5 h-5 text-blue-900" />
               Request a Promotion
             </DialogTitle>
             <p className="text-sm text-muted-foreground">
@@ -383,8 +383,8 @@ export default function InfluencerProfile() {
                       className={cn(
                         "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all",
                         selected
-                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                          : "bg-background text-foreground border-border hover:border-primary hover:text-primary"
+                          ? "bg-blue-900 text-blue-900-foreground  text-white border-blue-900 shadow-sm"
+                          : "bg-background text-foreground border-border  hover:border-blue-900 hover:text-blue-900"
                       )}
                     >
                       {selected && <Check className="w-3.5 h-3.5" />}
@@ -420,7 +420,7 @@ export default function InfluencerProfile() {
               <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={submitting}>
+              <Button type="submit" className="bg-blue-900 border-blue-900" disabled={submitting}>
                 {submitting ? "Sending..." : "Send Request"}
               </Button>
             </DialogFooter>

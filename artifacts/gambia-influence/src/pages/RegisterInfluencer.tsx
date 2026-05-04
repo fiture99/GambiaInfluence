@@ -372,7 +372,7 @@ export default function RegisterInfluencer() {
                 <Button 
                   type="submit" 
                   size="lg" 
-                  className="w-full md:w-auto h-14 px-10 text-lg font-bold rounded-xl hover-elevate"
+                  className="w-full md:w-auto h-14 bg-blue-900 border-blue-900 px-10 text-lg font-bold rounded-xl hover-elevate"
                   disabled={createInfluencer.isPending}
                 >
                   {createInfluencer.isPending ? "Creating Profile..." : "Create Creator Profile"}

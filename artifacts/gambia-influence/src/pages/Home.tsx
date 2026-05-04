@@ -16,7 +16,7 @@ const getNicheConfig = (niche: string) => {
   if (normalized.includes('tech') || normalized.includes('game')) return { icon: MonitorPlay, color: 'bg-indigo-500/10 text-indigo-600', border: 'border-indigo-200 hover:border-indigo-400' };
   if (normalized.includes('fitness') || normalized.includes('health') || normalized.includes('sport')) return { icon: Dumbbell, color: 'bg-red-500/10 text-red-600', border: 'border-red-200 hover:border-red-400' };
   if (normalized.includes('travel')) return { icon: Globe, color: 'bg-cyan-500/10 text-cyan-600', border: 'border-cyan-200 hover:border-cyan-400' };
-  return { icon: Smile, color: 'bg-primary/10 text-primary', border: 'border-primary/20 hover:border-primary/40' };
+  return { icon: Smile, color: 'bg-blue-900/10 text-blue-900', border: 'border-blue-900/20 hover:border-blue-900/40' };
 };
 
 export default function Home() {
@@ -41,11 +41,11 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-left space-y-8">
-              <div className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary font-bold text-sm mb-4 border border-primary/20">
+              <div className="inline-block px-4 py-1.5 rounded-full bg-blue-900/10 text-blue-900 font-bold text-sm mb-4 border border-blue-900/20">
                 The #1 Influencer Platform in The Gambia
               </div>
               <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-foreground leading-[1.1]">
-                Discover <span className="text-primary relative inline-block">
+                Discover <span className="text-blue-900 relative inline-block">
                   Authentic
                   <svg className="absolute w-full h-3 -bottom-1 left-0 text-secondary" viewBox="0 0 100 10" preserveAspectRatio="none">
                     <path d="M0,5 Q50,0 100,5 Q50,10 0,5 Z" fill="currentColor" />
@@ -57,7 +57,7 @@ export default function Home() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Link href="/influencers">
-                  <Button size="lg" className="w-full sm:w-auto text-lg h-14 px-8 rounded-xl font-bold hover-elevate shadow-lg shadow-primary/20">
+                  <Button size="lg" className="w-full bg-blue-900 border-blue-900 sm:w-auto text-lg h-14 px-8 rounded-xl font-bold hover-elevate shadow-lg shadow-blue-900/20">
                     Find Creators
                   </Button>
                 </Link>
@@ -77,7 +77,7 @@ export default function Home() {
                   <img src={heroImages[0]} alt="Creator" className="w-full h-full object-cover" />
                   <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 p-3">
                     <p className="text-white font-bold text-sm">ST</p>
-                    <p className="text-primary text-xs font-medium">Music</p>
+                    <p className="text-blue-900 text-xs font-medium">Music</p>
                   </div>
                 </div>
                 {/* Top left */}
@@ -98,7 +98,7 @@ export default function Home() {
                 </div>
                 
                 {/* Decorative blob */}
-                <div className="absolute z-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl mix-blend-multiply opacity-60"></div>
+                <div className="absolute z-0 w-96 h-96 bg-blue-900/20 rounded-full blur-3xl mix-blend-multiply opacity-60"></div>
                 <div className="absolute z-0 w-72 h-72 bg-secondary/20 rounded-full blur-3xl mix-blend-multiply opacity-60 translate-x-20 translate-y-20"></div>
               </div>
             </div>
@@ -217,7 +217,7 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section className="py-24 bg-primary/5 border-y border-primary/10">
+      <section className="py-24 bg-blue-900/5 border-y border-blue-900/10">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">How It Works</h2>
@@ -226,7 +226,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8 md:gap-12 max-w-5xl mx-auto">
             <div className="bg-background p-8 rounded-3xl border shadow-sm relative text-center">
-              <div className="w-16 h-16 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-lg shadow-primary/20 -mt-16 border-4 border-background">1</div>
+              <div className="w-16 h-16 bg-blue-900 text-white-foreground rounded-2xl flex items-center justify-center text-2xl font-black text-white mx-auto mb-6 shadow-lg shadow-blue-900/20 -mt-16 border-4 border-background">1</div>
               <h3 className="text-xl font-bold mb-3">Discover Creators</h3>
               <p className="text-muted-foreground">Browse our directory of verified local influencers across various niches and platforms.</p>
             </div>
@@ -263,7 +263,7 @@ export default function Home() {
           ) : businesses && businesses.length > 0 ? (
             <div className="flex flex-wrap justify-center gap-4 md:gap-6 max-w-4xl mx-auto">
               {businesses.slice(0, 12).map(business => (
-                <div key={business.id} className="bg-card px-6 py-4 rounded-xl shadow-sm border-2 font-bold text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors flex items-center justify-center min-w-[140px] text-center">
+                <div key={business.id} className="bg-card px-6 py-4 rounded-xl shadow-sm border-2 font-bold text-muted-foreground hover:text-foreground hover:border-blue-900/50 transition-colors flex items-center justify-center min-w-[140px] text-center">
                   {business.businessName}
                 </div>
               ))}
@@ -274,7 +274,7 @@ export default function Home() {
             <h3 className="text-2xl font-black mb-4">Want to reach more customers?</h3>
             <p className="text-muted-foreground mb-8 max-w-md mx-auto">Create a business profile to start connecting with the perfect influencers for your brand.</p>
             <Link href="/register/business">
-              <Button size="lg" className="rounded-xl font-bold hover-elevate px-8 h-14 text-lg">
+              <Button size="lg" className="rounded-xl bg-blue-900 border-blue-900 font-bold hover-elevate px-8 h-14 text-lg">
                 Register Your Business
               </Button>
             </Link>

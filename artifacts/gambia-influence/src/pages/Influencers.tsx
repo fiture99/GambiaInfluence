@@ -90,8 +90,8 @@ export default function Influencers() {
                 onClick={() => setNiche("all")}
                 className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all border-2 ${
                   niche === "all" 
-                    ? "bg-primary text-primary-foreground border-primary" 
-                    : "bg-background text-foreground border-border hover:border-primary/50"
+                    ? "bg-blue-900 text-white-foreground text-white border-blue-900" 
+                    : "bg-background text-foreground border-border hover:border-blue-900/50"
                 }`}
               >
                 All Categories
