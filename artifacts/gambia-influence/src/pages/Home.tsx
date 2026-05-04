@@ -27,8 +27,8 @@ export default function Home() {
 
   // Profile images for hero collage
   const heroImages = [
-    "/profiles/fatou-jallow.png",
-    "/profiles/lamin-touray.png",
+    "/profiles/Molz.jpeg",
+    "/profiles/Molz.jpeg",
     "/profiles/mariama-ceesay.png",
     "/profiles/alieu-darboe.png",
     "/profiles/ndey-sanneh.png"
@@ -42,7 +42,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-left space-y-8">
               <div className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary font-bold text-sm mb-4 border border-primary/20">
-                The #1 Influencer Platform in West Africa
+                The #1 Influencer Platform in The Gambia
               </div>
               <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-foreground leading-[1.1]">
                 Discover <span className="text-primary relative inline-block">
@@ -53,7 +53,7 @@ export default function Home() {
                 </span> Creators
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground font-medium max-w-xl">
-                Connect your business with the most vibrant and influential voices shaping culture across The Gambia and Senegal.
+                Connect your business with the most vibrant and influential voices shaping culture across The Gambia.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Link href="/influencers">
@@ -76,8 +76,8 @@ export default function Home() {
                 <div className="absolute z-30 w-56 h-72 rounded-2xl overflow-hidden border-4 border-background shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
                   <img src={heroImages[0]} alt="Creator" className="w-full h-full object-cover" />
                   <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 p-3">
-                    <p className="text-white font-bold text-sm">Fatou Jallow</p>
-                    <p className="text-primary text-xs font-medium">Fashion</p>
+                    <p className="text-white font-bold text-sm">ST</p>
+                    <p className="text-primary text-xs font-medium">Music</p>
                   </div>
                 </div>
                 {/* Top left */}

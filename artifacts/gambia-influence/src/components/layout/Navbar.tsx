@@ -13,15 +13,15 @@ export function Navbar() {
           />
         </Link>
         <div className="flex items-center gap-6">
-          <Link href="/influencers" className="text-sm font-medium hover:text-primary transition-colors">
-            Browse
+          <Link href="/influencers" className="text-sm font-medium  transition-colors">
+            <Button  className="bg-transparent text-prmary border-0 hover:text-primary hover:border-b-2 hover:border-primary hover:rounded-none">Browse</Button>
           </Link>
           <div className="flex gap-2">
             <Link href="/register/influencer" className="hidden sm:block">
-              <Button variant="outline">Join as Influencer</Button>
+              <Button variant="outline"  className=" border-0 hover:text-primary hover:border-b-2 hover:border-primary hover:rounded-none">Join as Influencer</Button>
             </Link>
-            <Link href="/register/business">
-              <Button>For Businesses</Button>
+            <Link href="/register/business"  >
+              <Button className="bg-blue-900 text-white border-0 border-b-2 border-blue-900 hover:bg-transparent hover:text-primary hover:border-b-2 hover:border-primary hover:rounded-none">For Businesses</Button>    
             </Link>
           </div>
         </div>
