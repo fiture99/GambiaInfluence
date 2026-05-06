@@ -29,7 +29,7 @@ export default function Home() {
   const heroImages = [
     "/profiles/Molz.jpeg",
     "/profiles/Molz.jpeg",
-    "/profiles/mariama-ceesay.png",
+    "/profiles/attack.png",
     "/profiles/alieu-darboe.png",
     "/profiles/ndey-sanneh.png"
   ];
