@@ -211,7 +211,7 @@ export default function InfluencerProfile() {
                     onClick={() => setModalOpen(true)}
                   >
                     <Megaphone className="w-5 h-5  mr-2" />
-                    Request Promotion
+                    Request
                   </Button>
                   <p className="text-xs text-muted-foreground text-center">
                     No account needed · Admin reviews all requests
@@ -320,7 +320,7 @@ export default function InfluencerProfile() {
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <Megaphone className="w-5 h-5 text-blue-900" />
-              Request a Promotion
+              Request
             </DialogTitle>
             <p className="text-sm text-muted-foreground">
               Send a request for <strong>{influencer.name}</strong> to promote your product or service.
