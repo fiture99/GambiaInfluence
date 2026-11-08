@@ -1,0 +1,27 @@
+Frontend
+pnpm install --no-frozen-lockfile && pnpm --filter @workspace/gambia-influence run build
+
+
+
+artifacts/gambia-influence/dist/public
+
+
+Backend
+
+pnpm install --no-frozen-lockfile && pnpm --filter @workspace/api-server run build
+
+node --enable-source-maps ./artifacts/api-server/dist/index.mjs
+
+
+Env
+https://gambiainfluence.onrender.com
+/
+
+Rewrite
+/api/*	https://gambiainfluence.onrender.com/api/*
+
+/*		/index.html
+
+
+
+postgresql://gaminfluencer_user:B6VXsRkGhArWjn0m4DDv2U03z33bQciC@dpg-d7o9hrpj2pic739ni8vg-a/gaminfluencer

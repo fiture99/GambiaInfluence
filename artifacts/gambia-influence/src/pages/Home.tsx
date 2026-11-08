@@ -27,7 +27,7 @@ export default function Home() {
 
   // Profile images for hero collage
   const heroImages = [
-    "/profiles/Molz.jpeg",
+    "/profiles/ST-Da_Gambian_Dream_Brikama_Boyo.jpg",
     "/profiles/Molz.jpeg",
     "/profiles/attack.png",
     "/profiles/alieu-darboe.png",
