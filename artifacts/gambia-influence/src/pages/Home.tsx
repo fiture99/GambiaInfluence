@@ -30,8 +30,8 @@ export default function Home() {
     "/profiles/ST-Da_Gambian_Dream_Brikama_Boyo.jpg",
     "/profiles/Molz.jpeg",
     "/profiles/attack.png",
-    "/profiles/alieu-darboe.png",
-    "/profiles/ndey-sanneh.png"
+    "/profiles/Kitabu.jpg",
+    "/profiles/fatou.jpg"
   ];
 
   return (
